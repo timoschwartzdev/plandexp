@@ -223,31 +223,7 @@ with st.sidebar:
     # On garde ton nom de variable : upload
     upload = st.file_uploader("Déposez un fichier", type=["csv", "xlsx", "xls"])
 
-    if upload is not None:
-        # On définit les deux lignes d'en-tête pour ton Excel AP1 + Caractéristique
-        # Ligne 0 = AP1, Ligne 1 = Nom de la colonne
-        header_indices = [0, 1] 
-        
-        try:
-            # On appelle la fonction en utilisant 'upload' et 'header_rows'
-            df = read_file(
-                file_name=upload.name, 
-                file_bytes=upload.getvalue(), 
-                header_rows=header_indices
-            )
-            
-            # On sauvegarde le DataFrame dans la session pour que le reste du code y accède
-            st.session_state['df'] = df
-            # --- AJOUT : Réinitialisation si le fichier change ---
-            if "last_file" not in st.session_state or st.session_state["last_file"] != upload.name:
-                st.session_state["X_cols"] = []
-                st.session_state["Y_cols"] = []
-                st.session_state["last_file"] = upload.name
-                st.rerun() # On force Streamlit à recalculer avec les nouvelles options
-            st.success("✅ Fichier chargé !")
-            
-        except Exception as e:
-            st.error(f"❌ Erreur de lecture : {e}")
+    
     else:
         st.info("💡 En attente d'un fichier...")
 
