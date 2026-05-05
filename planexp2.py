@@ -223,9 +223,7 @@ with st.sidebar:
     # On garde ton nom de variable : upload
     upload = st.file_uploader("Déposez un fichier", type=["csv", "xlsx", "xls"])
 
-    
-    else:
-        st.info("💡 En attente d'un fichier...")
+
 
    
 # Jeu de données d'exemple si besoin
