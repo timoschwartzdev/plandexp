@@ -75,6 +75,7 @@ def read_file(file_name: str, file_bytes: bytes, header_rows: list) -> pd.DataFr
             header=None,
             engine="openpyxl",
             na_values=["#N/A", "#DIV/0!", "#VALUE!", "#REF!", "#NUM!"]
+            keep_errors=False
         )
 
     header_part = df_raw.iloc[header_rows]
