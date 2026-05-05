@@ -63,33 +63,42 @@ st.caption("Importez vos données, ajustez un modèle, visualisez les effets, fa
 # =========================
 
 
+
 def read_file(file_name: str, file_bytes: bytes, header_rows: list) -> pd.DataFrame:
     import io
     import pandas as pd
+    from openpyxl import load_workbook
 
     if file_name.endswith(".csv"):
-        df_raw = pd.read_csv(io.BytesIO(file_bytes), header=None)
+        return pd.read_csv(io.BytesIO(file_bytes), header=None)
+
+    # ✅ Lecture Excel via openpyxl (robuste aux erreurs Excel)
+    wb = load_workbook(io.BytesIO(file_bytes), data_only=True)
+    ws = wb.active
+
+    data = []
+    for row in ws.iter_rows(values_only=True):
+        clean_row = []
+        for val in row:
+            # openpyxl renvoie None pour les erreurs Excel
+            clean_row.append(val)
+        data.append(clean_row)
+
+    df_raw = pd.DataFrame(data)
+
+    # Gestion des en‑têtes
+    if header_rows:
+        header_part = df_raw.iloc[header_rows]
+        new_cols = []
+        for c in range(header_part.shape[1]):
+            vals = header_part.iloc[:, c].astype(str).replace("nan", "")
+            new_cols.append("_".join(v for v in vals if v.strip()))
+        df = df_raw.drop(header_rows).reset_index(drop=True)
+        df.columns = new_cols
     else:
-        df_raw = pd.read_excel(
-            io.BytesIO(file_bytes),
-            header=None,
-            engine="openpyxl",
-            na_values=["#N/A", "#DIV/0!", "#VALUE!", "#REF!", "#NUM!"],
-            keep_errors=False
-        )
+        df = df_raw.reset_index(drop=True)
+        df.columns = [f"Col_{i}" for i in range(df.shape[1])]
 
-    header_part = df_raw.iloc[header_rows]
-
-    new_columns = []
-    for col in range(len(header_part.columns)):
-        values = header_part.iloc[:, col].astype(str).replace("nan", "").tolist()
-        new_columns.append("_".join(v for v in values if v.strip()))
-
-    df = df_raw.drop(header_rows).reset_index(drop=True)
-    df.columns = new_columns
-
-    for col in df.columns:
-        df[col] = pd.to_numeric(df[col], errors="ignore")
 
     return df
 
