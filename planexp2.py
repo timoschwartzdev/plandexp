@@ -63,7 +63,6 @@ st.caption("Importez vos données, ajustez un modèle, visualisez les effets, fa
 # =========================
 
 
-@st.cache_data
 def read_file(file_name: str, file_bytes: bytes, header_rows: list) -> pd.DataFrame:
     import io
     import pandas as pd
