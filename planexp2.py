@@ -72,6 +72,7 @@ def read_file(file_name: str, file_bytes: bytes, header_rows: list) -> pd.DataFr
         df_raw = pd.read_csv(io.BytesIO(file_bytes), header=None)
     else:
         df_raw = pd.read_excel(io.BytesIO(file_bytes), header=None)
+        engine="openpyxl"
     
     # --- ATTENTION : SUPPRIME LA LIGNE QUI ÉTAIT ICI (df_raw = pd.read_excel...) ---
     
