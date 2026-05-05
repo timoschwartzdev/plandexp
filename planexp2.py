@@ -62,13 +62,13 @@ st.caption("Importez vos données, ajustez un modèle, visualisez les effets, fa
 # OUTILS / FONCTIONS
 # =========================
 
+
 @st.cache_data
 def read_file(file_name: str, file_bytes: bytes, header_rows: list) -> pd.DataFrame:
     import io
-    import pandas as pd # S'assurer que pandas est dispo ici
+    import pandas as pd
 
-    # 1. On choisit le bon lecteur selon l'extension
-    if file_name.endswith('.csv'):
+    if file_name.endswith(".csv"):
         df_raw = pd.read_csv(io.BytesIO(file_bytes), header=None)
     else:
         df_raw = pd.read_excel(
@@ -76,30 +76,23 @@ def read_file(file_name: str, file_bytes: bytes, header_rows: list) -> pd.DataFr
             header=None,
             engine="openpyxl",
             na_values=["#N/A", "#DIV/0!", "#VALUE!", "#REF!", "#NUM!"]
-)
+        )
 
-    
-    # --- ATTENTION : SUPPRIME LA LIGNE QUI ÉTAIT ICI (df_raw = pd.read_excel...) ---
-    
-    # 2. Extraire les lignes qui servent de headers
     header_part = df_raw.iloc[header_rows]
-    
-    # 3. Fusionner les noms de colonnes
+
     new_columns = []
     for col in range(len(header_part.columns)):
-        values = header_part.iloc[:, col].astype(str).replace('nan', '').tolist()
-        combined_name = "_".join([v for v in values if v.strip()]).strip()
-        new_columns.append(combined_name)
-    
-    # 4. Nettoyer le DataFrame
+        values = header_part.iloc[:, col].astype(str).replace("nan", "").tolist()
+        new_columns.append("_".join(v for v in values if v.strip()))
+
     df = df_raw.drop(header_rows).reset_index(drop=True)
     df.columns = new_columns
-    
-    # 5. Conversion numérique
+
     for col in df.columns:
-        df[col] = pd.to_numeric(df[col], errors='ignore')
-        
+        df[col] = pd.to_numeric(df[col], errors="ignore")
+
     return df
+
 
 
 def guess_columns(df: pd.DataFrame) -> Tuple[List[str], List[str]]:
